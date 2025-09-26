@@ -3,7 +3,7 @@ import Modal from "../components/ui/modal";
 import { useEmployees } from "../hooks/employeeUse";
 import { useDepartments } from "../hooks/departmentUse";
 import { calculateAgeFromDOB } from "../utils/employerUtills";
-import EmployeeForm from "../components/ui/employeeForm";
+import EmployeeForm from "../components/ui/empCreateForm";
 
 export default function Employers() {
   const { employees, loading, add, update, remove } = useEmployees();
@@ -12,10 +12,10 @@ export default function Employers() {
   const [openModal, setOpenModal] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const handleSave = async (payload) => {
+  const handleSave = async (id ,payload) => {
     try {
       if (editing) {
-        await update(editing.id, payload);
+        await update(id, payload);
       } else {
         await add(payload);
       }
@@ -71,7 +71,7 @@ export default function Employers() {
               </thead>
               <tbody className="text-sm text-gray-700">
                 {employees.map((emp) => (
-                  <tr key={emp.id} className="border-b">
+                  <tr key={emp.employeeId} className="border-b">
                     <td className=" py-3">
                       {emp.firstName} {emp.lastName}
                     </td>
@@ -94,7 +94,7 @@ export default function Employers() {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(emp.id)}
+                        onClick={() => handleDelete(emp.employeeId)}
                         className="px-2 py-1 text-red-600 hover:underline"
                       >
                         Delete

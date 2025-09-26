@@ -1,17 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
 
-  <ItemGroup>
-    <!-- Use Swashbuckle for OpenAPI/Swagger in .NET 6 -->
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-    
-    <!-- Compatible SQL client for .NET 6 -->
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0" />
-  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
+  </ItemGroup>
 
 </Project>

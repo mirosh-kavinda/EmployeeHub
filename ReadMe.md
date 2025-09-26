@@ -2,11 +2,10 @@
 
 This project consists of two main parts:
 
-1. **Frontend (React / Flutter / Angular, etc.)**
+1. **Frontend (Vite(React Based) )**
 2. **Backend (.NET API with SQL Server)**
 
 Both work together to provide a full-stack application.
-
 ---
 
 ## 🛠️ Prerequisites
@@ -14,10 +13,10 @@ Both work together to provide a full-stack application.
 Before you begin, make sure you have installed:
 
 * [Docker](https://docs.docker.com/get-docker/)
-* [.NET 6+ SDK](https://dotnet.microsoft.com/en-us/download)
-* Node.js + npm / yarn (for frontend)
-* [DBeaver](https://dbeaver.io/) or any SQL client (for database management)
-* Manjaro/Arch dependencies (for backend DB connectivity):
+* [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download)
+* [Node 20.19.5 ]  + Vite (for frontend)
+
+
 
   ```bash
   sudo pacman -S docker unixodbc

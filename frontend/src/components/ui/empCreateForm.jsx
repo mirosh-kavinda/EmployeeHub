@@ -4,6 +4,7 @@ import { InputField } from "./inputField";
 
 export default function EmployeeForm({ initial, departments, onSave, onCancel }) {
   const [firstName, setFirstName] = useState(initial?.firstName || "");
+   const employeeId =initial?.employeeId || "";
   const [lastName, setLastName] = useState(initial?.lastName || "");
   const [email, setEmail] = useState(initial?.email || "");
   const [dateOfBirth, setDateOfBirth] = useState(
@@ -69,7 +70,7 @@ export default function EmployeeForm({ initial, departments, onSave, onCancel })
       departmentId,
     };
     try {
-      await onSave(payload);
+      await onSave(employeeId,payload);
     } finally {
       setSaving(false);
     }
@@ -137,7 +138,7 @@ export default function EmployeeForm({ initial, departments, onSave, onCancel })
           >
             <option value="">-- select department --</option>
             {departments.map((d) => (
-              <option key={d.id} value={d.id}>
+              <option key={d.departmentId} value={d.departmentId}>
                 {d.departmentName} ({d.departmentCode})
               </option>
             ))}
