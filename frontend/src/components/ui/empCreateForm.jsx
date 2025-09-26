@@ -4,6 +4,7 @@ import { InputField } from "./inputField";
 
 export default function EmployeeForm({ initial, departments, onSave, onCancel }) {
   const [firstName, setFirstName] = useState(initial?.firstName || "");
+   const employeeId =initial?.employeeId || "";
   const [lastName, setLastName] = useState(initial?.lastName || "");
   const [email, setEmail] = useState(initial?.email || "");
   const [dateOfBirth, setDateOfBirth] = useState(
@@ -69,35 +70,38 @@ export default function EmployeeForm({ initial, departments, onSave, onCancel })
       departmentId,
     };
     try {
-      await onSave(payload);
+      await onSave(employeeId,payload);
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 bg-white"
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <InputField
           label="First Name *"
           type="text"
           value={firstName}
           onChange={setFirstName}
-          placeholder="Enter first name"
+          placeholder="John"
         />
         <InputField
           label="Last Name *"
           type="text"
           value={lastName}
           onChange={setLastName}
-          placeholder="Enter last name"
+          placeholder="Doe"
         />
         <InputField
           label="Email *"
           type="email"
           value={email}
           onChange={setEmail}
-          placeholder="Enter email"
+          placeholder="john.doe@example.com"
         />
         <InputField
           label="Date of Birth *"
@@ -106,11 +110,13 @@ export default function EmployeeForm({ initial, departments, onSave, onCancel })
           onChange={handleDobChange}
         />
         <div>
-          <label className="block text-sm font-medium">Age</label>
+          <label className="block text-sm font-medium text-gray-600">
+            Age
+          </label>
           <input
             value={age}
             disabled
-            className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-gray-50"
+            className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 text-gray-700"
           />
         </div>
         <InputField
@@ -118,19 +124,21 @@ export default function EmployeeForm({ initial, departments, onSave, onCancel })
           type="number"
           value={salary}
           onChange={setSalary}
-          placeholder="Enter salary"
+          placeholder="50000"
         />
-        <div className="col-span-2">
-          <label className="block text-sm font-medium">Department *</label>
+        <div className="col-span-1 sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-600">
+            Department *
+          </label>
           <select
             value={departmentId}
             onChange={(e) => setDepartmentId(e.target.value)}
             required
-            className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
-            <option value="">-- select --</option>
+            <option value="">-- select department --</option>
             {departments.map((d) => (
-              <option key={d.id} value={d.id}>
+              <option key={d.departmentId} value={d.departmentId}>
                 {d.departmentName} ({d.departmentCode})
               </option>
             ))}
@@ -138,18 +146,18 @@ export default function EmployeeForm({ initial, departments, onSave, onCancel })
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4">
+      <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 border rounded-lg hover:bg-gray-100"
+          className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={saving}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {saving ? "Saving..." : "Save"}
         </button>

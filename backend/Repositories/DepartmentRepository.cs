@@ -1,94 +1,117 @@
-using Microsoft.Data.SqlClient;
 using EmpHub.Models;
 using EmpHub.Repositories.Interfaces;
-using EmpHub.Models;
-   using EmpHub.Services.Interfaces;
+using Microsoft.Data.SqlClient;
+
 namespace EmpHub.Repositories
 {
-    public class DepartmentRepository : IDepartmentRepository
+    public class DepartmentRepository(IConfiguration configuration) : IDepartmentRepository
     {
-        private readonly string _connectionString;
-
-        public DepartmentRepository(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("DefaultConnection") 
-                ?? throw new ArgumentNullException(nameof(configuration));
-        }
+        private readonly string _conn =
+            configuration.GetConnectionString("DefaultConnection")
+            ?? throw new ArgumentNullException(nameof(configuration));
 
         public async Task<List<Department>> GetAllAsync()
         {
-            var departments = new List<Department>();
-            
-            using var connection = new SqlConnection(_connectionString);
+            var departments = new Dictionary<int, Department>();
+
+            using var connection = new SqlConnection(_conn);
             var command = new SqlCommand(
-                "SELECT DepartmentId, DepartmentCode, DepartmentName, CreatedAt, UpdatedAt " +
-                "FROM Departments ORDER BY DepartmentName", connection);
-            
+                @"SELECT d.DepartmentId, d.DepartmentCode, d.DepartmentName, d.CreatedAt, d.UpdatedAt,
+                 e.EmployeeId, e.FirstName, e.LastName, e.Email
+          FROM Departments d
+          LEFT JOIN Employees e ON d.DepartmentId = e.DepartmentId
+          ORDER BY d.DepartmentName, e.FirstName",
+                connection
+            );
+
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
-            
+
             while (await reader.ReadAsync())
             {
-                
-                // departments.Add(new Department ()
-                // {
-                //     DepartmentId = reader.GetInt32("DepartmentId"),
-                //     DepartmentCode = reader.GetString("DepartmentCode"),
-                //     DepartmentName = reader.GetString("DepartmentName"),
-                //     CreatedAt = reader.GetDateTime("CreatedAt"),
-                //     UpdatedAt = reader.IsDBNull("UpdatedAt") ? null : reader.GetDateTime("UpdatedAt")
-                // });
-                 departments.Add(new Department 
+                int deptId = reader.GetInt32(reader.GetOrdinal("DepartmentId"));
+
+                if (!departments.ContainsKey(deptId))
                 {
-                    DepartmentId = 2,
-                    DepartmentCode = "asdas",
-                    DepartmentName = "asdas",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt =  DateTime.Now, 
-                });
+                    var department = new Department
+                    {
+                        DepartmentId = deptId,
+                        DepartmentCode = reader.GetString(reader.GetOrdinal("DepartmentCode")),
+                        DepartmentName = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                        UpdatedAt = reader.IsDBNull(reader.GetOrdinal("UpdatedAt"))
+                            ? null
+                            : reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
+                        Members = [],
+                    };
+
+                    departments.Add(deptId, department);
+                }
+
+                // Handle employees (nullable since LEFT JOIN)
+                if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                {
+                    var member = new Member
+                    {
+                        FirstName = reader.IsDBNull(reader.GetOrdinal("FirstName"))
+                            ? null
+                            : reader.GetString(reader.GetOrdinal("FirstName")),
+                        LastName = reader.IsDBNull(reader.GetOrdinal("LastName"))
+                            ? null
+                            : reader.GetString(reader.GetOrdinal("LastName")),
+                        Email = reader.IsDBNull(reader.GetOrdinal("Email"))
+                            ? null
+                            : reader.GetString(reader.GetOrdinal("Email")),
+                    };
+
+                    departments[deptId].Members!.Add(member);
+                }
             }
-            
-            
-            return departments;
+            return [.. departments.Values];
         }
 
         public async Task<Department?> GetByIdAsync(int id)
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new SqlConnection(_conn);
             var command = new SqlCommand(
-                "SELECT DepartmentId, DepartmentCode, DepartmentName, CreatedAt, UpdatedAt " +
-                "FROM Departments WHERE DepartmentId = @id", connection);
-            
+                "SELECT DepartmentId, DepartmentCode, DepartmentName, CreatedAt, UpdatedAt "
+                    + "FROM Departments WHERE DepartmentId = @id",
+                connection
+            );
+
             command.Parameters.AddWithValue("@id", id);
             await connection.OpenAsync();
-            
+
             using var reader = await command.ExecuteReaderAsync();
-            
+
             if (await reader.ReadAsync())
             {
                 return new Department
                 {
-                    // DepartmentId = reader.GetInt32("DepartmentId"),
-                    // DepartmentCode = reader.GetString("DepartmentCode"),
-                    // DepartmentName = reader.GetString("DepartmentName"),
-                    // CreatedAt = reader.GetDateTime("CreatedAt"),
-                    // UpdatedAt = reader.IsDBNull("UpdatedAt") ? null : reader.GetDateTime("UpdatedAt")
+                    DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                    DepartmentCode = reader.GetString(reader.GetOrdinal("DepartmentCode")),
+                    DepartmentName = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                    // UpdatedAt = reader.IsDBNull(reader.GetOrdinal("UpdatedAt")) ? null
+                    //     : reader.GetDateTime(reader.GetOrdinal("UpdatedAt"))
                 };
             }
-            
+
             return null;
         }
 
         public async Task<int> CreateAsync(Department department)
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new SqlConnection(_conn);
             var command = new SqlCommand(
-                "INSERT INTO Departments (DepartmentCode, DepartmentName, CreatedAt) " +
-                "VALUES (@code, @name, GETUTCDATE()); SELECT SCOPE_IDENTITY();", connection);
-            
+                "INSERT INTO Departments (DepartmentCode, DepartmentName, CreatedAt) "
+                    + "VALUES (@code, @name, GETUTCDATE()); SELECT SCOPE_IDENTITY();",
+                connection
+            );
+
             command.Parameters.AddWithValue("@code", department.DepartmentCode);
             command.Parameters.AddWithValue("@name", department.DepartmentName);
-            
+
             await connection.OpenAsync();
             var result = await command.ExecuteScalarAsync();
             return Convert.ToInt32(result);
@@ -96,15 +119,17 @@ namespace EmpHub.Repositories
 
         public async Task<bool> UpdateAsync(Department department)
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new SqlConnection(_conn);
             var command = new SqlCommand(
-                "UPDATE Departments SET DepartmentCode = @code, DepartmentName = @name, " +
-                "UpdatedAt = GETUTCDATE() WHERE DepartmentId = @id", connection);
-            
+                "UPDATE Departments SET DepartmentCode = @code, DepartmentName = @name, "
+                    + "UpdatedAt = GETUTCDATE() WHERE DepartmentId = @id",
+                connection
+            );
+
             command.Parameters.AddWithValue("@code", department.DepartmentCode);
             command.Parameters.AddWithValue("@name", department.DepartmentName);
             command.Parameters.AddWithValue("@id", department.DepartmentId);
-            
+
             await connection.OpenAsync();
             var rowsAffected = await command.ExecuteNonQueryAsync();
             return rowsAffected > 0;
@@ -112,21 +137,51 @@ namespace EmpHub.Repositories
 
         public async Task<bool> DeleteAsync(int id)
         {
-            using var connection = new SqlConnection(_connectionString);
-            var command = new SqlCommand("DELETE FROM Departments WHERE DepartmentId = @id", connection);
-            command.Parameters.AddWithValue("@id", id);
-            
+            using var connection = new SqlConnection(_conn);
             await connection.OpenAsync();
-            var rowsAffected = await command.ExecuteNonQueryAsync();
-            return rowsAffected > 0;
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                // 1. Delete all dependent records (Employees)
+                var deleteEmployeesCommand = new SqlCommand(
+                    "DELETE FROM Employees WHERE DepartmentId = @id",
+                    connection,
+                    transaction
+                );
+                deleteEmployeesCommand.Parameters.AddWithValue("@id", id);
+
+                await deleteEmployeesCommand.ExecuteNonQueryAsync();
+
+                // 2. Delete the main record (Department)
+                var deleteDepartmentCommand = new SqlCommand(
+                    "DELETE FROM Departments WHERE DepartmentId = @id",
+                    connection,
+                    transaction
+                );
+                deleteDepartmentCommand.Parameters.AddWithValue("@id", id);
+
+                var rowsAffected = await deleteDepartmentCommand.ExecuteNonQueryAsync();
+
+                transaction.Commit();
+                return rowsAffected > 0;
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                return false;
+            }
         }
 
         public async Task<bool> ExistsAsync(int id)
         {
-            using var connection = new SqlConnection(_connectionString);
-            var command = new SqlCommand("SELECT COUNT(1) FROM Departments WHERE DepartmentId = @id", connection);
+            using var connection = new SqlConnection(_conn);
+            var command = new SqlCommand(
+                "SELECT COUNT(1) FROM Departments WHERE DepartmentId = @id",
+                connection
+            );
             command.Parameters.AddWithValue("@id", id);
-            
+
             await connection.OpenAsync();
             var count = (int)(await command.ExecuteScalarAsync() ?? 0);
             return count > 0;

@@ -1,19 +1,13 @@
 using EmpHub.Models;
 using EmpHub.Repositories.Interfaces;
 using EmpHub.Services.Interfaces;
-using EmpHub.Services;
-using EmpHub.Repositories;
 
 namespace EmpHub.Services
 {
-    public class DepartmentService : IDepartmentService
+    public class DepartmentService(IDepartmentRepository departmentRepository) : IDepartmentService
     {
-        private readonly IDepartmentRepository _departmentRepository;
-
-        public DepartmentService(IDepartmentRepository departmentRepository)
-        {
-            _departmentRepository = departmentRepository ?? throw new ArgumentNullException(nameof(departmentRepository));
-        }
+        private readonly IDepartmentRepository _departmentRepository =
+            departmentRepository ?? throw new ArgumentNullException(nameof(departmentRepository));
 
         public async Task<List<Department>> GetAllDepartmentsAsync()
         {
@@ -33,7 +27,7 @@ namespace EmpHub.Services
             // Business validation
             if (string.IsNullOrWhiteSpace(createDto.DepartmentCode))
                 throw new ArgumentException("Department code is required");
-            
+
             if (string.IsNullOrWhiteSpace(createDto.DepartmentName))
                 throw new ArgumentException("Department name is required");
 
@@ -41,12 +35,12 @@ namespace EmpHub.Services
             {
                 DepartmentCode = createDto.DepartmentCode.Trim(),
                 DepartmentName = createDto.DepartmentName.Trim(),
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
 
             var id = await _departmentRepository.CreateAsync(department);
             department.DepartmentId = id;
-            
+
             return department;
         }
 
@@ -58,7 +52,7 @@ namespace EmpHub.Services
             // Business validation
             if (string.IsNullOrWhiteSpace(updateDto.DepartmentCode))
                 throw new ArgumentException("Department code is required");
-            
+
             if (string.IsNullOrWhiteSpace(updateDto.DepartmentName))
                 throw new ArgumentException("Department name is required");
 
@@ -70,7 +64,7 @@ namespace EmpHub.Services
             {
                 DepartmentId = updateDto.DepartmentId,
                 DepartmentCode = updateDto.DepartmentCode.Trim(),
-                DepartmentName = updateDto.DepartmentName.Trim()
+                DepartmentName = updateDto.DepartmentName.Trim(),
             };
 
             return await _departmentRepository.UpdateAsync(department);

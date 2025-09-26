@@ -4,21 +4,17 @@ using EmpHub.Services.Interfaces;
 
 namespace EmpHub.Services
 {
-    public class EmployeeService : IEmployeeService
+    public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployeeService
     {
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeRepository _employeeRepository =
+            employeeRepository ?? throw new ArgumentNullException(nameof(employeeRepository));
 
-        public EmployeeService(IEmployeeRepository employeeRepository)
-        {
-            _employeeRepository = employeeRepository ?? throw new ArgumentNullException(nameof(employeeRepository));
-        }
-
-        public async Task<List<Employee>> GetAllEmployeesAsync()
+        public async Task<List<Employee>> GetEmployeesAsync()
         {
             return await _employeeRepository.GetAllAsync();
         }
 
-        public async Task<Employee?> GetEmployeeByIdAsync(int id)
+        public async Task<List<Employee>?> GetEmployeeByIdAsync(int id)
         {
             if (id <= 0)
                 return null;
@@ -52,11 +48,10 @@ namespace EmpHub.Services
                 DateOfBirth = createDto.DateOfBirth,
                 Salary = createDto.Salary,
                 DepartmentId = createDto.DepartmentId,
-                DepartmentName = createDto.DepartmentName
             };
 
             var id = await _employeeRepository.CreateAsync(employee);
-            employee.EmployeeId = id;
+            employee.EmployeeId = id!;
 
             return employee;
         }
@@ -82,20 +77,17 @@ namespace EmpHub.Services
             if (updateDto.DepartmentId == null || updateDto.DepartmentId <= 0)
                 throw new ArgumentException("Valid Department ID is required");
 
-            // Check if employee exists
             if (!await _employeeRepository.ExistsAsync(id))
                 return false;
 
-            var employee = new Employee
+            var employee = new UpdateEmployeeDto
             {
-                EmployeeId = updateDto.EmployeeId,
                 FirstName = updateDto.FirstName.Trim(),
                 LastName = updateDto.LastName.Trim(),
                 Email = updateDto.Email.Trim(),
                 DateOfBirth = updateDto.DateOfBirth,
                 Salary = updateDto.Salary,
                 DepartmentId = updateDto.DepartmentId,
-                DepartmentName = updateDto.DepartmentName
             };
 
             return await _employeeRepository.UpdateAsync(employee);

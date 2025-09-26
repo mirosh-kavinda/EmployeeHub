@@ -7,7 +7,15 @@ namespace EmpHub.Models
         public string DepartmentName { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public List<Member>? Members { get; set; }
     }
+
+    public class Member { 
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Email { get; set; }
+    }
+    
 
     public class CreateDepartmentDto
     {

@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../components/ui/modal";
 import { useDepartments } from "../hooks/departmentUse";
-import {DepartmentCard} from "../components/ui/departmentCard"
-import DepartmentForm from "../components/ui/departmentForm";
+import {DepartmentCard} from "../components/ui/deptCardView"
+import DepartmentForm from "../components/ui/deptCreateForm";
+import { useEmployeesByDept } from "../hooks/employeeByDeptUse";
+import EmployeeViewModal from "../components/ui/deptEmployeeListView"
 
 export default function Departments() {
   const { departments, loading, add, update, remove } = useDepartments();
   const [openModal, setOpenModal] = useState(false);
   const [editing, setEditing] = useState(null);
+  const { employees, loading: empLoading, fetchEmployees } = useEmployeesByDept();
+ const [viewEmpModal, setviewEmpModal] = useState(false);
 
+const handleEmpView = async (departmentId) => {
+  await fetchEmployees(departmentId); // fetch employees on demand
+  setviewEmpModal(true);
+};
   const handleSave = async (payload) => {
     try {
       if (editing) {
@@ -57,6 +65,7 @@ export default function Departments() {
             <DepartmentCard
               key={d.id}
               department={d}
+              onView={() => handleEmpView(d.departmentId)}
               onEdit={() => {
                 setEditing(d);
                 setOpenModal(true);
@@ -69,7 +78,13 @@ export default function Departments() {
           )}
         </div>
       )}
-
+       <EmployeeViewModal
+        open={viewEmpModal}
+        onClose={() => setviewEmpModal(false)}
+        employees={employees}
+        title="Department Employees"
+        loading={empLoading} 
+      />
       <Modal
         open={openModal}
         onClose={() => {

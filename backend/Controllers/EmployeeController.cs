@@ -6,14 +6,9 @@ namespace EmpHub.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class EmployeesController : ControllerBase
+    public class EmployeesController(IEmployeeService employeeService) : ControllerBase
     {
-        private readonly IEmployeeService _employeeService;
-
-        public EmployeesController(IEmployeeService employeeService)
-        {
-            _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
-        }
+        private readonly IEmployeeService _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
 
         //--- Get All Employee Records ---//
         // GET: api/employees
@@ -22,7 +17,7 @@ namespace EmpHub.Controllers
         {
             try
             {
-                var employees = await _employeeService.GetAllEmployeesAsync();
+                var employees = await _employeeService.GetEmployeesAsync();
                 return Ok(employees);
             }
             catch (Exception ex)
@@ -94,9 +89,7 @@ namespace EmpHub.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (id != updateDto.EmployeeId)
-                return BadRequest(new { message = "ID in URL does not match ID in request body" });
-
+         
             try
             {
                 var success = await _employeeService.UpdateEmployeeAsync(id, updateDto);
