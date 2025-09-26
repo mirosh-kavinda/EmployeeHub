@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "../components/ui/modal";
-import{ useEmployees } from "../hooks/employeeUse";
+import { useEmployees } from "../hooks/employeeUse";
 import { useDepartments } from "../hooks/departmentUse";
 import { calculateAgeFromDOB } from "../utils/employerUtills";
 import EmployeeForm from "../components/ui/employeeForm";
@@ -39,9 +39,8 @@ export default function Employers() {
 
   return (
     <div className="flex">
-
-      {/* Main content */}
-      <div className="flex-1 p-6 bg-gray-50 min-h-screen">
+      <div className="flex-1  bg-gray-50 min-h-screen">
+        
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Employees</h2>
           <button
@@ -49,7 +48,7 @@ export default function Employers() {
               setEditing(null);
               setOpenModal(true);
             }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className=" px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             + Add New Employee
           </button>
@@ -58,22 +57,22 @@ export default function Employers() {
         {loading ? (
           <p className="text-gray-600">Loading...</p>
         ) : (
-          <div className="overflow-x-auto bg-white shadow rounded-lg">
+          <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-600">
-                  <th className="px-4 py-3">Full Name</th>
+                <tr className="text-left text-sm font-semibold text-gray-600 border-b border-gray-300">
+                  <th className="py-3 ">Full Name</th>
                   <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Age</th>
                   <th className="px-4 py-3">Salary</th>
                   <th className="px-4 py-3">Department</th>
-                  <th className="px-4 py-3">Action</th>
+                  <th className="px-8 py-3">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 text-sm text-gray-700">
+              <tbody className="text-sm text-gray-700">
                 {employees.map((emp) => (
-                  <tr key={emp.id}>
-                    <td className="px-4 py-3">
+                  <tr key={emp.id} className="border-b">
+                    <td className=" py-3">
                       {emp.firstName} {emp.lastName}
                     </td>
                     <td className="px-4 py-3">{emp.email}</td>
@@ -90,13 +89,13 @@ export default function Employers() {
                           setEditing(emp);
                           setOpenModal(true);
                         }}
-                        className="px-2 py-1 text-blue-600 hover:bg-blue-50 rounded"
+                        className="px-2 py-1 text-blue-600 hover:underline"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(emp.id)}
-                        className="px-2 py-1 text-red-600 hover:bg-red-50 rounded"
+                        className="px-2 py-1 text-red-600 hover:underline"
                       >
                         Delete
                       </button>
@@ -105,7 +104,10 @@ export default function Employers() {
                 ))}
                 {employees.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-3 text-center">
+                    <td
+                      colSpan={6}
+                      className="px-4 py-3 text-center text-gray-500 border-b"
+                    >
                       No employees found
                     </td>
                   </tr>
@@ -138,4 +140,3 @@ export default function Employers() {
     </div>
   );
 }
-
