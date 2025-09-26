@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "departmentName": "Finance",
+    "departmentCode": "FIN",
+    "head": "Alice"
+  },
+  {
+    "id": 2,
+    "departmentName": "HR",
+    "departmentCode": "HR",
+    "head": "Bob"
+  },
+  {
+    "id": 3,
+    "departmentName": "IT",
+    "departmentCode": "IT",
+    "head": "Charlie"
+  }
+]

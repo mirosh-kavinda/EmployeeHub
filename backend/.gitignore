@@ -1,0 +1,62 @@
+# Build & output folders
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.dotCover
+
+# Visual Studio / Rider / IDE files
+.vs/
+.idea/
+*.sln.ide
+*.sln.DotSettings
+*.ncrunch*
+_ReSharper*/
+
+# NuGet packages
+*.nupkg
+packages/
+.nuget/
+
+# MSBuild / logs
+*.log
+*.tlog/
+*.lastbuildstate
+*.vspscc
+*.vssscc
+*.cache
+*.resharper
+
+# ASP.NET / web
+wwwroot/lib/
+
+# Publish output
+publish/
+*.publish.xml
+*.deploy.cmd
+*.deploy-readme.txt
+
+# Database / LocalDB
+*.mdf
+*.ldf
+*.ndf
+
+# Rider / VS Code
+.vscode/
+.idea/
+
+# Sensitive files
+appsettings.*.json
+secrets.json
+.env
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.DS_Store

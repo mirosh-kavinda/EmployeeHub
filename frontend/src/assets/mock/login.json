@@ -1,0 +1,6 @@
+[
+    { "id": 1, "name": "Finance", "head": "Alice" },
+    { "id": 2, "name": "HR", "head": "Bob" },
+    { "id": 3, "name": "IT", "head": "Charlie" }
+  ]
+  
