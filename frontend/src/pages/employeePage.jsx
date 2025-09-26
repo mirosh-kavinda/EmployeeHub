@@ -40,18 +40,19 @@ export default function Employers() {
   return (
     <div className="flex">
       <div className="flex-1  bg-gray-50 min-h-screen">
-        
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Employees</h2>
-          <button
-            onClick={() => {
-              setEditing(null);
-              setOpenModal(true);
-            }}
-            className=" px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            + Add New Employee
-          </button>
+          <div className="hidden md:flex items-center gap-2 mb-6 p-6">
+            <button
+              onClick={() => {
+                setEditing(null);
+                setOpenModal(true);
+              }}
+              className=" px-4 py-2  add_button text-lg text-center"
+            >
+              + Add New Employee
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -91,13 +92,13 @@ export default function Employers() {
                         }}
                         className="px-2 py-1 text-blue-600 hover:underline"
                       >
-                        Edit
+                        <Edit />
                       </button>
                       <button
                         onClick={() => handleDelete(emp.employeeId)}
                         className="px-2 py-1 text-red-600 hover:underline"
                       >
-                        Delete
+                        <Trash />
                       </button>
                     </td>
                   </tr>

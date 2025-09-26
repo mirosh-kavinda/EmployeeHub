@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import Modal from "../components/ui/modal";
 import { useDepartments } from "../hooks/departmentUse";
 import {DepartmentCard} from "../components/ui/deptCardView"
@@ -51,7 +51,7 @@ const handleEmpView = async (departmentId) => {
             setEditing(null);
             setOpenModal(true);
           }}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
+          className="px-4 py-2 bg-blue-600 add_button"
         >
           + Add New Department
         </button>
