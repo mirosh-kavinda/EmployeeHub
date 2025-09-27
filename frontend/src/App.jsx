@@ -4,6 +4,7 @@ import Departments from "./pages/departmentPage";
 import Employers from "./pages/employeePage";
 import LoginPage from "./pages/loginPage";
 import DashboardLayout from "./components/layout/dashboardLayout";
+import { ToastContainer } from 'react-toastify';
 
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/departments" element={<Departments />} />
         </Route>
       </Routes>
+      <ToastContainer />
     </BrowserRouter>
   );
 }

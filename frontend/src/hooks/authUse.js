@@ -13,12 +13,9 @@ export const useLogin = () => {
     setError("");
 
     try {
-      // 👉 Replace this with repository call later
+     
       if (adminId === "admin" && password === "password") {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ id: "admin", name: "Admin User" })
-        );
+      
         window.location.href = "/employers";
       } else {
         throw new Error(ERROR_MESSAGE);
@@ -44,10 +41,8 @@ export const useLogin = () => {
 
 export const useLogout = () => {
     const logout = () => {
-      // Remove user from localStorage
       localStorage.removeItem("user");
   
-      // Redirect to login page
       window.location.href = "/";
     };
   

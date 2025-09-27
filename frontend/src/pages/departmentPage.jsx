@@ -63,7 +63,7 @@ const handleEmpView = async (departmentId) => {
         <div className="grid md:grid-cols-2 gap-6">
           {departments.map((d) => (
             <DepartmentCard
-              key={d.id}
+              key={d.departmentId}
               department={d}
               onView={() => handleEmpView(d.departmentId)}
               onEdit={() => {

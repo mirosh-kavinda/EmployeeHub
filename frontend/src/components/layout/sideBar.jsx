@@ -17,7 +17,7 @@ export default function Sidebar() {
 
   return (
     <div className="h-screen w-20 md:w-56 border-r border-gray-200 shadow-sm flex flex-col">
-      {/* Top Logo for collapsed sidebar */}
+
       <div className="flex md:hidden justify-center items-center p-4">
         <img src={logo} alt="Logo" className="w-10 h-10 object-contain" />
       </div>

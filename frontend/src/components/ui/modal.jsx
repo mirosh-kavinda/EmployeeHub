@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
 export default function Modal({ open, onClose, children, title }) {
-  // close modal on ESC key
+
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") onClose();
@@ -14,11 +14,12 @@ export default function Modal({ open, onClose, children, title }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-lg w-full max-w-lg mx-4 p-6 relative animate-fadeIn"
+        className="bg-white rounded-xl shadow-lg w-auto max-w-[90vw] max-h-[90vh] mx-4 p-6 relative animate-fadeIn"
+
         onClick={(e) => e.stopPropagation()}
       >
         <button
