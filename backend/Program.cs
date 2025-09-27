@@ -5,35 +5,43 @@ using EmpHub.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Register repositories & services
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddControllers();
 
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure CORS
+const string CorsPolicy = "AllowFrontend";
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+    options.AddPolicy(CorsPolicy, policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000") // frontend (local/dev)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 });
 
 var app = builder.Build();
+
+// Swagger in dev only
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-else
-{
-    //policy in production
-    app.UseCors();
-}
 
+// Middlewares
 app.UseHttpsRedirection();
-app.UseCors(); // use CORS before Authorization
-app.UseAuthorization();
-app.MapControllers();
 
+app.UseCors(CorsPolicy); // apply named policy
+app.UseAuthorization();
+
+app.MapControllers();
 app.Run();

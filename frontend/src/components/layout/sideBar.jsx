@@ -17,17 +17,20 @@ export default function Sidebar() {
 
   return (
     <div className="h-screen w-20 md:w-56 border-r border-gray-200 shadow-sm flex flex-col">
+
       <div className="flex md:hidden justify-center items-center p-4">
         <img src={logo} alt="Logo" className="w-10 h-10 object-contain" />
       </div>
 
       <div className="flex flex-col justify-between h-full">
-        <div className="hidden md:flex items-center gap-2 mb-6 p-6">
+        {/* Logo / Title for expanded sidebar */}
+        <div className="hidden md:flex items-center gap-2 mb-9 p-6">
           <h3 className="text-lg text-center font-bold text-gray-800">Employee Hub</h3>
           <img src={logo} alt="Logo" className="w-14 h-14 object-contain" />
         </div>
 
-        <nav className="flex flex-col gap-2 flex-1">
+        {/* Navigation */}
+        <nav className="flex  flex-col gap-2 flex-1">
           <Link to="/employers" className={linkClasses("/employers")}>
             <Users className="w-6 h-6" />
             <span className="hidden md:inline">All Users</span>
@@ -47,6 +50,7 @@ export default function Sidebar() {
           </button>
         </nav>
 
+        {/* Sidebar Hero Image */}
         <img
           src={sideBarHero}
           alt="Sidebar Hero"

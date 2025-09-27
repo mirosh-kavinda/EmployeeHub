@@ -1,6 +1,7 @@
 import logo from "../assets/images/logo.png";
 import { useLogin } from "../hooks/authUse";
 import {InputField} from "../components/ui/inputField";
+import {showCustomToast} from "../components/ui/customProgresBar"
 const LoginPage = () => {
   const { adminId, setAdminId, password, setPassword, error, loading, login } =
     useLogin();
@@ -31,7 +32,9 @@ const LoginPage = () => {
               style={{ width: "80px", height: "80px" }}
             />
           </div>
-
+        <div className="mb-4 p-3 text-sm bg-gray-100 text-gray-700 rounded-md text-center">
+            <p>Use <strong>ID:</strong> <code>'admin</code> | <strong>Password:</strong> <code>password</code> for login</p>
+          </div>
           <form onSubmit={handleSubmit} className="space-y-6 w-full">
             <InputField
               label="Admin ID / Manager ID"
@@ -49,14 +52,7 @@ const LoginPage = () => {
             />
 
             {error && <ErrorMessage message={error} />}
-            <div className="text-sm text-right">
-              <a
-                href="#"
-                className="font-medium text-red-600 hover:text-red-700"
-              >
-                Forget your password? Reset!
-              </a>
-            </div>
+           
 
             <button
               type="submit"
