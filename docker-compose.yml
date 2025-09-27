@@ -1,0 +1,75 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD}
+    ports:
+      - "${SQL_PORT:-1433}:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql        # SQL data
+      - ./db/init:/docker-entrypoint-initdb.d:ro  # SQL init scripts
+    networks:
+      - app-network
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: db-init
+    depends_on:
+      - sqlserver
+    env_file:
+      - .env
+    volumes:
+      - ./db/init:/scripts:ro           # init script path inside container
+    entrypoint: ["/bin/bash", "-c"]
+    command: >
+      "for i in {1..60}; do
+         /opt/mssql-tools/bin/sqlcmd -S sqlserver,1433 -U sa -P \"$SA_PASSWORD\" -Q 'SELECT 1' >/dev/null 2>&1 && break || (echo 'Waiting for sqlserver...'; sleep 2);
+       done;
+       echo 'Running init.sql';
+       /opt/mssql-tools/bin/sqlcmd -S sqlserver,1433 -U sa -P \"$SA_PASSWORD\" -i /scripts/init.sql -C;
+       echo 'DB init finished';"
+    restart: "no"
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_URLS=http://+:${BACKEND_PORT:-5000}
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=DeptEmpDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+    depends_on:
+      - sqlserver
+      - db-init
+    ports:
+      - "${BACKEND_PORT:-5000}:${BACKEND_PORT:-5000}"
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:${BACKEND_PORT:-5000}
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    networks:
+      - app-network
+
+volumes:
+  mssql-data:
+
+networks:
+  app-network:
+    driver: bridge

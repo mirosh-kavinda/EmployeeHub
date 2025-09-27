@@ -1,261 +1,237 @@
-# 🚀 Project Setup Guide
+-----
 
-This project consists of two main parts:
+# 🚀 Full-Stack Employee Management App
 
-1. **Frontend (Vite(React Based) )**
-2. **Backend (.NET API with SQL Server)**
+Welcome\! This is a full-stack web application featuring a **React (Vite)** frontend, a **.NET 8 Web API** backend, and a **Microsoft SQL Server** database. The entire environment is containerized with **Docker**, making setup a breeze.
 
-Both work together to provide a full-stack application.
----
+This project is a full-stack application built with the following technologies:
+
+* **Frontend**: **Vite** and **React**.
+* **Backend**: **.NET 8** Web API.
+* **Database**: **Microsoft SQL Server 2022+**.
+* **Containerization**: **Docker**.
+* **Runtime**: **Node.js 20.19.5** is required for the frontend development environment.commands.
+
+-----
 
 ## 🛠️ Prerequisites
 
-Before you begin, make sure you have installed:
+In this project i used docker to manage and build the whole project one go , but all you can build and added changes on local builds
+Before you start, ensure you have the following tools installed on your system.
 
-* [Docker](https://docs.docker.com/get-docker/)
-* [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download)
-* [Node 20.19.5 ]  + Vite (for frontend)
+### 1\. Docker
 
+Docker is essential for running the containerized application.
 
+  * **Windows**: Download and install **[Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)**. Make sure to enable the **WSL 2 backend** during installation, as it's required.
+  * **Linux**:
+      * **Arch / Manjaro**:"My Setup"
+        ```bash
+        sudo pacman -S docker
+        ```
+      * **Ubuntu / Debian**:
+        ```bash
+        sudo apt-get update
+        sudo apt-get install docker.io
+        ```
+      * After installation, add your user to the `docker` group to run commands without `sudo`:
+        ```bash
+        sudo usermod -aG docker $USER
+        # You'll need to log out and back in for this change to take effect.
+        ```
 
-  ```bash
-  sudo pacman -S docker unixodbc
-  ```
+### 2\. .NET 8 SDK
 
----
+Required for running the backend API manually.
 
-## 🪟 Windows Users – Docker & SQL Server Setup
+  * **Download**: **[.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)**
 
-If you are using a **Windows PC**, follow these steps to set up SQL Server with Docker:
+### 3\. Node.js
 
-### 1️⃣ Install Docker Desktop
+Required for running the frontend application manually.
 
-* Download from: [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-* Install and ensure **WSL 2** is enabled (Docker requires it on Windows).
+  * **Download**: **[Node.js](https://nodejs.org/en)** (Version 20.x or later is recommended)
 
-### 2️⃣ Pull SQL Server Docker Image
+-----
 
-Open **PowerShell** or **Command Prompt**:
+## ⚙️ Environment Configuration
 
-```powershell
-docker pull mcr.microsoft.com/mssql/server:2022-latest
+Before launching the application, you need to create configuration files for the backend and frontend. These files tell the services how to connect to each other and the database.
+
+### 1\. Backend Connection String
+
+In the `backend` directory, create or edit the `appsettings.Development.json` file and add your database connection string.
+
+**File:** `backend/appsettings.Development.json`
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection":  "Server=sqlserver;Database=DeptEmpDB;User Id=sa;Password=Mssql_7442_er;TrustServerCertificate=True;"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}
 ```
 
-### 3️⃣ Run SQL Server Container
+> **Note**: If you run using Docker Compose, the `Server` name should be the service name defined in `docker-compose.yml` (e.g., `Server=sqlserver`), not `localhost`.
 
-```powershell
-docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Mssql@7442er" `
-           -p 1433:1433 `
-           --name sql1 `
-           -d mcr.microsoft.com/mssql/server:2022-latest
+### 2\. Frontend API URL
+
+In the `frontend` directory, create a file named `.env` and add the URL for the backend API.
+
+**File:** `frontend/.env`
+
+```env
+VITE_API_BASE_URL=http://localhost:5000/api
 ```
 
-> Make sure the password meets SQL Server complexity rules.
+-----
 
-### 4️⃣ Connect Using Tools
+## 3\.Docker Composer env build
 
-You can use any of the following to manage your database:
+ make a local .env (copy example) if edit .env if you want to change passwords/ports
+   ```bash 
+   cp .env.example .env
+   ```
 
-* **SQL Server Management Studio (SSMS)** – Windows native GUI:
-  [Download SSMS](https://aka.ms/ssmsfullsetup)
+ 
 
-* **DBeaver** (cross-platform):
+## 🚀 Running the Application
 
-  * Host: `localhost`
-  * Port: `1433`
-  * Username: `sa`
-  * Password: `Mssql@7442er`
-  * Enable **Trust server certificate** if prompted.
+You have two options for running the project: using Docker Compose (recommended for simplicity) or running each service manually.
 
-### 5️⃣ Verify Connection
+### Option 1: Run with Docker Compose (Recommended)
 
-* Open SSMS or DBeaver and connect to `localhost:1433`.
-* Run:
+This is the easiest way to get the entire application stack—frontend, backend, and database—up and running with a single command. This method will automatically set up the database using the `init.sql` script.
 
-```sql
-SELECT name FROM sys.databases;
-GO
-```
+1.  **Build and Start Containers:**
+    Open your terminal in the project's root directory (where the `docker-compose.yml` file is located) and run:
 
-You should see the `master` database. Later, you can create `DeptEmpDB` as described in the setup.
+    ```bash
+    docker-compose up --build
+    ```
 
-💡 **Tip for Windows Users:**
+    To run in the background (detached mode), add the `-d` flag:
 
-* Docker Desktop must be **running** before starting the container.
-* Make sure **port 1433** is not blocked by firewall.
-* Password must be strong (at least 8 characters, uppercase, lowercase, digit, symbol).
+    ```bash
+    docker-compose up --build -d
+    ```
+2.  **Initialize DB:**
 
----
+      ``` bash
+       docker compose logs -f db-init
+     ```
 
-## 🐳 Running SQL Server with Docker (Linux / Manjaro)
+3.  **Check Logs:**
 
-Start SQL Server 2022 inside Docker:
+      ``` bash
+       docker compose logs -f db-init
+                  docker compose logs -f sqlserver
+      
+         docker compose logs -f backend
+         docker compose logs -f frontend
+
+     ```
+3.  **Access the Application:**
+
+      * **Frontend**: [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000)
+      * **Backend API**: [http://localhost:5000](https://www.google.com/search?q=http://localhost:5000)
+
+3.  **Stopping the Application:**
+    To stop all containers, press `Ctrl + C` in the terminal or run:
+
+    ```bash
+    docker-compose down
+    ```
+    To remove containers
+     ```bash
+    docker-compose down -v
+    ```
+
+### Option 2: Run Each Service Manually
+
+Use this method if you want to run the frontend, backend, and database as separate processes for development or debugging purposes.
+
+#### Step 1: Start the SQL Server Container // you can use Server manager for
+
+First, start the SQL Server database using Docker.
 
 ```bash
-docker run -e 'ACCEPT_EULA=Y' \
-           -e 'SA_PASSWORD=Mssql@7442er' \
+docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Mssql@7442er" \
            -p 1433:1433 \
            --name sql1 \
            -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
-Check container status:
+Check if the container is running with `docker ps`.
 
-```bash
-docker ps
+update backend/appsetting.json
+```text
+"DefaultConnection": "Server=localhost,1433;Database=DeptEmpDB;User Id=sa;Password=Mssql@7442er;TrustServerCertificate=True;"
 ```
+if go with the Local Servers (windows/ssms) connection string goes like this (backend)
 
----
+```text
+"DefaultConnection" :Server=localhost;Database=DeptEmpDB;User Id=sa;Password=Mssql@7442er;TrustServerCertificate=True;"
 
-## 🗄️ Database Setup
 
-1. Connect using `sqlcmd` (or DBeaver):
+#### Step 2: Set Up the Database
 
-   ```bash
-   sqlcmd -S localhost -U sa -P 'Mssql@7442er' -C
-   ```
+Connect to the database using a tool like **DBeaver**, **SSMS**, or the command-line tool `sqlcmd`. Then, run the following SQL script to create the database and tables.
 
-2. Create the database:
+-- db/init/init.sql // this is the init DB Script
 
-   ```sql
-   CREATE DATABASE DeptEmpDB;
-   GO
-   ```
+#### Step 3: Run the .NET Backend
 
-3. (Optional) Add sample tables:
+1.  Navigate to the backend directory:
+    ```bash
+    cd backend
+    ```
+2.  Install dependencies and run the API:
+    ```bash
+    dotnet restore
+    dotnet run
+    ```
+    The API will be available at `http://localhost:5000`.
 
-   ```sql
-   USE DeptEmpDB;
-   CREATE TABLE Departments (
-       DeptId INT PRIMARY KEY IDENTITY,
-       DeptName NVARCHAR(100) NOT NULL
-   );
+#### Step 4: Run the React Frontend
 
-   CREATE TABLE Employees (
-       EmpId INT PRIMARY KEY IDENTITY,
-       EmpName NVARCHAR(100) NOT NULL,
-       DeptId INT FOREIGN KEY REFERENCES Departments(DeptId)
-   );
-   GO
-   ```
+1.  In a **new terminal**, navigate to the frontend directory:
+    ```bash
+    cd frontend
+    ```
+2.  Install dependencies and start the development server:
+    ```bash
+    npm install
+    npm start
+    ```
+    The frontend will be available at `http://localhost:3000`.
 
----
+-----
 
-## ⚙️ Backend Setup (.NET)
+## 🧰 Useful Docker Commands
 
-1. Navigate to backend project folder:
+Here are some helpful commands for managing the standalone SQL Server container (`sql1`).
 
-   ```bash
-   cd backend
-   ```
-
-2. Restore packages:
-
-   ```bash
-   dotnet restore
-   ```
-
-3. Update `appsettings.json` with your connection string:
-
-   ```json
-   "ConnectionStrings": {
-     "DefaultConnection": "Server=localhost,1433;Database=DeptEmpDB;User Id=sa;Password=Mssql@7442er;TrustServerCertificate=True;"
-   }
-   ```
-
-4. Run the backend API:
-
-   ```bash
-   dotnet run
-   ```
-
-Backend should now be available at:
-👉 [http://localhost:5000](http://localhost:5000) (or the port defined in your launch settings)
-
----
-
-## 💻 Frontend Setup
-
-1. Navigate to frontend project:
-
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-   or
-
-   ```bash
-   yarn install
-   ```
-
-3. Start the development server:
-
-   ```bash
-   npm start
-   ```
-
-   or
-
-   ```bash
-   yarn start
-   ```
-
-Frontend should now be available at:
-👉 [http://localhost:3000](http://localhost:3000) (or the configured port)
-
----
-
-## 🔗 Connecting Frontend to Backend
-
-* Update your frontend `.env` file (or config file) with the backend API URL:
-
-  ```env
-  REACT_APP_API_URL=http://localhost:5000
-  ```
-
-* Frontend will call backend API, which communicates with the SQL Server DB.
-
----
-
-## ✅ Quick Test
-
-1. Insert data into SQL Server (via DBeaver or `sqlcmd`).
-2. Start backend → it should expose endpoints like `/api/employees`.
-3. Start frontend → it should fetch data from backend API.
-
----
-
-## 🧰 Useful Commands
-
-Stop SQL Server container:
-
-```bash
-docker stop sql1
-```
-
-Start again:
-
-```bash
-docker start sql1
-```
-
-Remove container (⚠️ deletes DB):
-
-```bash
-docker rm -f sql1
-```
-
----
-
-## 📌 Notes
-
-* Default SQL user → **sa**
-* Default password → **Mssql@7442er**
-* Default database → **DeptEmpDB**
-* If you run into SSL/TLS issues on Linux, use `TrustServerCertificate
+  * **Stop the container:**
+    ```bash
+    docker stop sql1
+    ```
+  * **Start the container again:**
+    ```bash
+    docker start sql1
+    ```
+  * **View container logs:**
+    ```bash
+    docker logs sql1
+    ```
+  * **Remove the container (⚠️ this deletes all data):**
+    ```bash
+    docker rm -f sql1
+    ```
