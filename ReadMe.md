@@ -4,6 +4,11 @@
 
 Welcome\! This is a full-stack web application featuring a **React (Vite)** frontend, a **.NET 8 Web API** backend, and a **Microsoft SQL Server** database. The entire environment is containerized with **Docker**, making setup a breeze.
 
+
+* **UI mock up Link : https://www.figma.com/design/NS8IIJrGu64wfzUUqUjVIO/employeehub?node-id=0-1&p=f&t=8UTgjR53zMbaEo9d-0
+* **Git project Link : https://github.com/mirosh-kavinda/EmployeeHub
+
+
 This project is a full-stack application built with the following technologies:
 
 * **Frontend**: **Vite** and **React**.
