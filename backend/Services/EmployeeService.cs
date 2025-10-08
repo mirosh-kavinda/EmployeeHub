@@ -9,9 +9,25 @@ namespace EmpHub.Services
         private readonly IEmployeeRepository _employeeRepository =
             employeeRepository ?? throw new ArgumentNullException(nameof(employeeRepository));
 
-        public async Task<List<Employee>> GetEmployeesAsync()
+        private static int CalculateAge(DateTime dob)
         {
-            return await _employeeRepository.GetAllAsync();
+            var today = DateTime.UtcNow.Date;
+            var age = today.Year - dob.Year;
+            if (dob.Date > today.AddYears(-age))
+                age--;
+            return age;
+        }
+
+        //calling the repository methods
+            public async Task<List<Employee>> GetEmployeesAsync()
+        {
+            var employees = await _employeeRepository.GetAllAsync();
+
+            return employees.Select(e =>
+            {
+                e.Age = CalculateAge(e.DateOfBirth ?? DateTime.UtcNow.Date);
+                return e;
+            }).ToList();
         }
 
         public async Task<List<Employee>?> GetEmployeeByIdAsync(int id)

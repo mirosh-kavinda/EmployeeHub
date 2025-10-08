@@ -10,15 +10,6 @@ namespace EmpHub.Repositories
             config.GetConnectionString("DefaultConnection")
             ?? throw new ArgumentNullException(nameof(config));
 
-        private static int CalculateAge(DateTime dob)
-        {
-            var today = DateTime.UtcNow.Date;
-            var age = today.Year - dob.Year;
-            if (dob.Date > today.AddYears(-age))
-                age--;
-            return age;
-        }
-
         //--- Get All Employee Records ---//
         // GET: api/employees
         public async Task<List<Employee>> GetAllAsync()
@@ -47,7 +38,6 @@ namespace EmpHub.Repositories
                         LastName = reader.GetString(reader.GetOrdinal("LastName")),
                         Email = reader.GetString(reader.GetOrdinal("Email")),
                         DateOfBirth = dob,
-                        Age = CalculateAge(dob),
                         Salary = reader.GetDecimal(reader.GetOrdinal("Salary")),
                         DepartmentId = (int)reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                         DepartmentName = reader.GetString(reader.GetOrdinal("DepartmentName")),
